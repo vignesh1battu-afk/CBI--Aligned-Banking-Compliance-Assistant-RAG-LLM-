@@ -1,26 +1,8 @@
-import os
 import streamlit as st
 from openai import OpenAI
-from dotenv import load_dotenv
 
-# Load local .env file (for local development only)
-load_dotenv()
-
-# Try environment variable first (local)
-api_key = os.getenv("OPENAI_API_KEY")
-
-# If not found, try Streamlit Cloud secrets
-if not api_key:
-    try:
-        api_key = st.secrets["OPENAI_API_KEY"]
-    except Exception:
-        raise ValueError(
-            "OPENAI_API_KEY not found. Please set it in your .env file (local) "
-            "or in Streamlit Cloud secrets."
-        )
-
+api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=api_key)
-
 
 def generate_answer(query, retrieved_chunks):
     context_blocks = []
@@ -36,7 +18,7 @@ def generate_answer(query, retrieved_chunks):
 You are a banking compliance assistant aligned with regulatory documents.
 
 Answer the question strictly using the provided context.
-Cite the source number in brackets like [Source 1] when referencing information.
+Cite the source number in brackets like [Source 1].
 Do not hallucinate.
 If information is not found, say:
 "Information not found in provided regulatory documents."
@@ -54,7 +36,7 @@ Answer:
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
         temperature=0,
-        max_tokens=800
+        max_tokens=700
     )
 
     return response.choices[0].message.content
